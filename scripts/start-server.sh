@@ -66,22 +66,23 @@ fi
 chmod -R ${DATA_PERM} ${DATA_DIR}
 find $SERVER_DIR -name "masterLog.*" -exec rm -f {} \;
 
-echo "---Prepare BeepinEx---"
-if [ ! -f ${SERVER_DIR}/BepInEx ]; then
+echo "---Prepare BepInEx---"
+if [ ! -f ${SERVER_DIR}/run_bepinex.sh ]; then
 	cd ${SERVER_DIR}
-	if wget curl -s https://api.github.com/repos/BepInEx/BepInEx/releases/latest | grep "BepInEx_linux_x64_.*zip" | cut -d : -f 2,3 | tr -d \" | wget -O bepinex.zip --show-progress --progress=bar:force:noscroll -qi - ; then
+    curl -s https://api.github.com/repos/BepInEx/BepInEx/releases/latest | grep "BepInEx_linux_x64_.*zip" | cut -d : -f 2,3 | tr -d \" | wget -O bepinex.zip --show-progress --progress=bar:force:noscroll -qi -
+	if [ ! -f ${SERVER_DIR}/bepinex.zip ]; then
+		echo "---Something went wrong, can't download 'BepInEx', putting server in sleep mode---"
+		sleep infinity
+	else
 		echo "---Sucessfully downloaded 'bepinex.zip'---"
         unzip -o bepinex.zip
         chmod +x run_bepinex.sh
         sed -i 's/executable_name=""/executable_name="rocketstation_DedicatedServer.x86_64"/g' run_bepinex.sh
         rm bepinex.zip
-	    echo "---BeepinEx successfully installed---"
-	else
-		echo "---Something went wrong, can't download 'BepInEx', putting server in sleep mode---"
-		sleep infinity
+	    echo "---BepInEx successfully installed---"
 	fi
 else
-	echo "---BeepinEx already installed---"
+	echo "---BepInEx already installed---"
 fi
 
 echo "---Server ready---"
